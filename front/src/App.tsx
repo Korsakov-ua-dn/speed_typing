@@ -3,21 +3,33 @@ import { useEffect, useRef, useState } from "react";
 import { useTimer } from "./hooks/useTimer";
 import { useLatest } from "./hooks/useLatest";
 
-const testData =
-  "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ipsam, quis?";
+const testData = `
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+
+import { App } from "./App.tsx";
+
+import "./index.css";
+
+createRoot(document.getElementById("root")!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>
+);
+`;
 
 const duration = 5_000;
 
 export function App() {
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
 
-  const [userInput, setUserInput] = useState<string | null>(null);
+  const [userInput, setUserInput] = useState<string>("");
 
   const onChangeHandler = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setUserInput(event.target.value);
   };
 
-  const { timeLeft, status, start } = useTimer(duration);
+  const { timeLeft, status, start, reset } = useTimer(duration);
 
   const statusRef = useLatest(status);
 
@@ -27,13 +39,10 @@ export function App() {
         textAreaRef.current?.focus();
       }
 
-      if (
-        event.key === "R" &&
-        event.shiftKey &&
-        statusRef.current === "finished"
-      ) {
-        start();
-        textAreaRef.current?.focus();
+      if (event.key === "Escape" && statusRef.current === "finished") {
+        setUserInput("");
+        reset();
+        // textAreaRef.current?.focus();
       }
     };
 
@@ -70,26 +79,56 @@ export function App() {
           {
             waiting: "Press any key to start",
             started: "Typing...",
-            finished: "You are finished ( shift + R to restart )",
+            finished: "You are finished ( Escape to restart )",
           }[status]
         }
       </div>
 
-      <div style={{ fontSize: "32px", fontWeight: 500 }}>{timeLeft}</div>
+      <div style={{ fontSize: "32px", fontWeight: 500 }}>
+        {Math.ceil(timeLeft)}
+      </div>
 
-      <div style={{ fontSize: "24px", fontWeight: 500 }}>{testData}</div>
+      <Text testData={testData} userInput={userInput} />
+
+      {/* <div style={{ fontSize: "24px", fontWeight: 500 }}>{testData}</div> */}
 
       <div style={{ height: "20px" }}>{userInput}</div>
 
       <textarea
         ref={textAreaRef}
         autoFocus
-        style={{ height: 0, border: "none", padding: 0 }}
+        // style={{ height: 0, border: "none", padding: 0 }}
         onChange={onChangeHandler}
+        value={userInput}
         name="hiddenUserInput"
-      >
-        {userInput}
-      </textarea>
+        disabled={status === "finished"}
+      />
+    </div>
+  );
+}
+
+interface Props {
+  testData: string;
+  userInput: string;
+}
+
+function Text({ testData, userInput }: Props) {
+  const testWords = testData.split(" ");
+  const typedWords = userInput.split(" ");
+
+  console.log({ typedWords });
+
+  return (
+    <div className="text" style={{ display: "flex" }}>
+      {testWords.map((word) => {
+        return (
+          <div className="word">
+            {`${word + "\u00a0"}`.split("").map((letter) => {
+              return <span>{letter}</span>;
+            })}
+          </div>
+        );
+      })}
     </div>
   );
 }

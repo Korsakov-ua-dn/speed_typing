@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 export function useTimer(duration: number) {
   const [timeLeft, setTimeLeft] = useState(duration / 1_000);
@@ -7,18 +7,14 @@ export function useTimer(duration: number) {
     "waiting"
   );
 
+  let intervalId: number | null = null;
+
   const start = useCallback(() => {
     setStatus("started");
-  }, []);
-
-  useEffect(() => {
-    if (status !== "started") {
-      return;
-    }
 
     const startTime = performance.now();
 
-    const intervalId = window.setInterval(() => {
+    intervalId = window.setInterval(() => {
       const now = performance.now();
 
       const delta = now - startTime;
@@ -26,15 +22,17 @@ export function useTimer(duration: number) {
       if (delta >= duration) {
         setStatus("finished");
         setTimeLeft(0);
+        intervalId && window.clearInterval(intervalId);
       } else {
-        setTimeLeft(Math.ceil((duration - delta) / 1_000));
+        setTimeLeft((duration - delta) / 1_000);
       }
     }, 1000);
+  }, [duration]);
 
-    return () => {
-      window.clearInterval(intervalId);
-    };
-  }, [status, duration]);
+  const reset = useCallback(() => {
+    setTimeLeft(duration / 1_000);
+    setStatus("waiting");
+  }, []);
 
-  return { timeLeft, status, start };
+  return { timeLeft, status, start, reset };
 }
