@@ -113,22 +113,31 @@ interface Props {
 }
 
 function Text({ testData, userInput }: Props) {
+  const testLetters = testData.split("");
   const testWords = testData.split(" ");
   const typedWords = userInput.split(" ");
 
   console.log({ typedWords });
 
   return (
-    <div className="text" style={{ display: "flex" }}>
+    <pre className="text" style={{ margin: 0, padding: "20px" }}>
+      {testLetters.map((letter) => {
+        return <span>{letter}</span>;
+      })}
+    </pre>
+  );
+
+  return (
+    <pre className="text" style={{ display: "flex" }}>
       {testWords.map((word) => {
         return (
-          <div className="word">
+          <pre className="word">
             {`${word + "\u00a0"}`.split("").map((letter) => {
               return <span>{letter}</span>;
             })}
-          </div>
+          </pre>
         );
       })}
-    </div>
+    </pre>
   );
 }
