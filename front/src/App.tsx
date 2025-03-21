@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { useTimer } from "./hooks/useTimer";
 import { useLatest } from "./hooks/useLatest";
+import { useTestTypesQuery } from "./entities/testType/hooks/useTestTypesQuery";
 
 const testData = `
 import { StrictMode } from "react";
@@ -18,9 +19,16 @@ createRoot(document.getElementById("root")!).render(
 );
 `;
 
-const duration = 5_000;
+const DURATION = 5_000;
+
+// const DEFAULT_TEST_TYPE = "typescript";
 
 export function App() {
+  const { types, status: typesFetchingStatus } = useTestTypesQuery();
+
+  console.log({ types });
+  console.log({ typesFetchingStatus });
+
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const [userInput, setUserInput] = useState<string>("");
@@ -29,7 +37,7 @@ export function App() {
     setUserInput(event.target.value);
   };
 
-  const { timeLeft, status, start, reset } = useTimer(duration);
+  const { timeLeft, status, start, reset } = useTimer(DURATION);
 
   const statusRef = useLatest(status);
 
