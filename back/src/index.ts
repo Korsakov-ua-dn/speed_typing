@@ -2,8 +2,8 @@ import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 
-import { testDataMap } from "./testData/index.js";
-import { isTestDataType } from "./utils/isTestDataType/index.js";
+import { testDataMap, testTypes } from "./testData/index.js";
+import { isTestType } from "./utils/isTestDataType/index.js";
 import { getTSAST } from "./utils/getTSAST/index.js";
 
 const app = new Hono();
@@ -14,10 +14,16 @@ app.get("/health-check", (ctx) => {
   return ctx.text("Success");
 });
 
-app.get("/test/:type", async (ctx) => {
+app.get("/tests", (ctx) => {
+  return ctx.json({
+    types: testTypes,
+  });
+});
+
+app.get("/tests/:type", async (ctx) => {
   const type = ctx.req.param("type");
 
-  if (!isTestDataType(type)) {
+  if (!isTestType(type)) {
     return ctx.json(
       {
         message: "invalid type",
@@ -54,5 +60,3 @@ serve(
     console.log(`Server is running on http://${info.address}:${info.port}`);
   }
 );
-
-export type TestDataType = "word" | "typescript";

@@ -1,9 +1,13 @@
-import type { TestDataType } from "../../index.js";
+import { testTypes, type TestType } from "../../testData/index.js";
 
-export const isTestDataType = (value: unknown): value is TestDataType => {
-  if (value === "word" || value === "typescript") {
-    return true;
+export const isTestType = (value: unknown): value is TestType => {
+  if (typeof value !== "string") {
+    return false;
   }
 
-  return false;
+  if (!testTypes.includes(value as (typeof testTypes)[number])) {
+    return false;
+  }
+
+  return true;
 };
