@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 
-import { useTimer } from "./hooks/useTimer";
-import { useLatest } from "./hooks/useLatest";
+import { useTimer } from "./shared/lib/hooks/useTimer";
+import { useLatest } from "./shared/lib/hooks/useLatest";
 import { useTestTypesQuery } from "./entities/testType/hooks/useTestTypesQuery";
+import { Layout } from "./shared/ui/Layout";
 
 const testData = `
 import { StrictMode } from "react";
@@ -72,46 +73,48 @@ export function App() {
   }, [start, statusRef]);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "16px",
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <div>
-        {
+    <Layout>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "16px",
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div>
           {
-            waiting: "Press any key to start",
-            started: "Typing...",
-            finished: "You are finished ( Escape to restart )",
-          }[status]
-        }
+            {
+              waiting: "Press any key to start",
+              started: "Typing...",
+              finished: "You are finished ( Escape to restart )",
+            }[status]
+          }
+        </div>
+
+        <div style={{ fontSize: "32px", fontWeight: 500 }}>
+          {Math.ceil(timeLeft)}
+        </div>
+
+        <Text testData={testData} userInput={userInput} />
+
+        {/* <div style={{ fontSize: "24px", fontWeight: 500 }}>{testData}</div> */}
+
+        <div style={{ height: "20px" }}>{userInput}</div>
+
+        <textarea
+          ref={textAreaRef}
+          autoFocus
+          // style={{ height: 0, border: "none", padding: 0 }}
+          onChange={onChangeHandler}
+          value={userInput}
+          name="hiddenUserInput"
+          disabled={status === "finished"}
+        />
       </div>
-
-      <div style={{ fontSize: "32px", fontWeight: 500 }}>
-        {Math.ceil(timeLeft)}
-      </div>
-
-      <Text testData={testData} userInput={userInput} />
-
-      {/* <div style={{ fontSize: "24px", fontWeight: 500 }}>{testData}</div> */}
-
-      <div style={{ height: "20px" }}>{userInput}</div>
-
-      <textarea
-        ref={textAreaRef}
-        autoFocus
-        // style={{ height: 0, border: "none", padding: 0 }}
-        onChange={onChangeHandler}
-        value={userInput}
-        name="hiddenUserInput"
-        disabled={status === "finished"}
-      />
-    </div>
+    </Layout>
   );
 }
 
