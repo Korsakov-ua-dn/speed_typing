@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 
+import { Layout } from "./shared/ui/Layout";
+import { Header } from "./shared/ui/Header";
 import { useTimer } from "./shared/lib/hooks/useTimer";
 import { useLatest } from "./shared/lib/hooks/useLatest";
+
 import { useTestTypesQuery } from "./entities/testType/hooks/useTestTypesQuery";
-import { Layout } from "./shared/ui/Layout";
+import { SettingsButton } from "./features/test/ui/SettingsButton/container";
 
 const testData = `
 import { StrictMode } from "react";
@@ -74,6 +77,10 @@ export function App() {
 
   return (
     <Layout>
+      <Header>
+        <SettingsButton />
+      </Header>
+
       <div
         style={{
           display: "flex",
