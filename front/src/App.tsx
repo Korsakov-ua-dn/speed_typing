@@ -5,33 +5,17 @@ import { Header } from "./shared/ui/Header";
 import { useTimer } from "./shared/lib/hooks/useTimer";
 import { useLatest } from "./shared/lib/hooks/useLatest";
 
-import { useTestTypesQuery } from "./entities/testType/hooks/useTestTypesQuery";
+import { useTestQuery } from "./entities/test/model/useTestQuery";
+import { useSettingsContext } from "./entities/settings/model/context";
+
 import { SettingsButton } from "./features/test/ui/SettingsButton/container";
 
-const testData = `
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-
-import { App } from "./App.tsx";
-
-import "./index.css";
-
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>
-);
-`;
-
-const DURATION = 5_000;
-
-// const DEFAULT_TEST_TYPE = "typescript";
-
 export function App() {
-  const { types, status: typesFetchingStatus } = useTestTypesQuery();
+  const { settings } = useSettingsContext();
 
-  console.log({ types });
-  console.log({ typesFetchingStatus });
+  console.log(settings.testType);
+
+  const { testData } = useTestQuery(settings.testType);
 
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -41,7 +25,7 @@ export function App() {
     setUserInput(event.target.value);
   };
 
-  const { timeLeft, status, start, reset } = useTimer(DURATION);
+  const { timeLeft, status, start, reset } = useTimer(settings.duration);
 
   const statusRef = useLatest(status);
 
@@ -91,7 +75,7 @@ export function App() {
           justifyContent: "center",
         }}
       >
-        <div>
+        <div className="hint">
           {
             {
               waiting: "Press any key to start",
@@ -101,20 +85,16 @@ export function App() {
           }
         </div>
 
-        <div style={{ fontSize: "32px", fontWeight: 500 }}>
+        <div className="timer" style={{ fontSize: "32px", fontWeight: 500 }}>
           {Math.ceil(timeLeft)}
         </div>
 
-        <Text testData={testData} userInput={userInput} />
-
-        {/* <div style={{ fontSize: "24px", fontWeight: 500 }}>{testData}</div> */}
-
-        <div style={{ height: "20px" }}>{userInput}</div>
+        <Text testData={testData?.text} userInput={userInput} />
 
         <textarea
           ref={textAreaRef}
           autoFocus
-          // style={{ height: 0, border: "none", padding: 0 }}
+          style={{ height: 0, border: "none", padding: 0 }}
           onChange={onChangeHandler}
           value={userInput}
           name="hiddenUserInput"
@@ -126,34 +106,38 @@ export function App() {
 }
 
 interface Props {
-  testData: string;
+  testData: string | undefined;
   userInput: string;
 }
 
 function Text({ testData, userInput }: Props) {
+  if (!testData) {
+    return "Loading...";
+  }
   const testLetters = testData.split("");
-  const testWords = testData.split(" ");
-  const typedWords = userInput.split(" ");
-
-  console.log({ typedWords });
+  const typedLetters = userInput.split("");
 
   return (
     <pre className="text" style={{ margin: 0, padding: "20px" }}>
-      {testLetters.map((letter) => {
-        return <span>{letter}</span>;
-      })}
-    </pre>
-  );
+      {testLetters.map((letter, index) => {
+        const typedLetter = typedLetters[index];
 
-  return (
-    <pre className="text" style={{ display: "flex" }}>
-      {testWords.map((word) => {
+        const color = (() => {
+          if (!typedLetter) {
+            return "#a1a1a1";
+          }
+
+          if (typedLetter === letter) {
+            return "#fff";
+          }
+
+          return "red";
+        })();
+
         return (
-          <pre className="word">
-            {`${word + "\u00a0"}`.split("").map((letter) => {
-              return <span>{letter}</span>;
-            })}
-          </pre>
+          <span key={index} style={{ color }}>
+            {letter}
+          </span>
         );
       })}
     </pre>

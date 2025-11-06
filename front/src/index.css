@@ -1,3 +1,7 @@
+:root {
+  --color: rgba(255, 255, 255, 0.87);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -13,7 +17,7 @@ body {
   font-size: 16px;
   font-weight: 400;
 
-  color: rgba(255, 255, 255, 0.87);
+  color: var(--color);
   color-scheme: light dark;
   background-color: #242424;
 
@@ -21,6 +25,11 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+button {
+  all: unset;
+  cursor: pointer;
 }
 
 #root {

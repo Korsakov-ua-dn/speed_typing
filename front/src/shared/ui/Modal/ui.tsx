@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 
+import "./style.css";
+
 import { Portal } from "../Portal";
 
 type Props = {
