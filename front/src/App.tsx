@@ -1,31 +1,36 @@
 import { useEffect, useRef, useState } from "react";
 
-import { Layout } from "./shared/ui/Layout";
-import { Header } from "./shared/ui/Header";
 import { useTimer } from "./shared/lib/hooks/useTimer";
 import { useLatest } from "./shared/lib/hooks/useLatest";
+import { useOpen } from "./shared/hooks/useOpen";
+import { Layout } from "./shared/ui/Layout";
+import { Header } from "./shared/ui/Header";
 
 import { useTestQuery } from "./entities/test/model/useTestQuery";
 import { useSettingsContext } from "./entities/settings/model/context";
 
 import { SettingsButton } from "./features/test/ui/SettingsButton/container";
+import { StatModal } from "./entities/test/ui/StatModal";
 
 export function App() {
   const { settings } = useSettingsContext();
 
-  console.log(settings.testType);
-
-  const { testData } = useTestQuery(settings.testType);
-
-  const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
+  const { testData, isLoading } = useTestQuery(settings.testType);
 
   const [userInput, setUserInput] = useState<string>("");
+
+  const { isOpen: isStatModalOpen, actions: statModalActions } = useOpen();
+
+  const { timeLeft, status, start, reset } = useTimer({
+    duration: settings.duration,
+    onFinish: statModalActions.open,
+  });
+
+  const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const onChangeHandler = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setUserInput(event.target.value);
   };
-
-  const { timeLeft, status, start, reset } = useTimer(settings.duration);
 
   const statusRef = useLatest(status);
 
@@ -57,7 +62,11 @@ export function App() {
       window.removeEventListener("keypress", keyPressHandler);
       window.removeEventListener("keydown", keydownHandler);
     };
-  }, [start, statusRef]);
+  }, [start]);
+
+  if (typeof testData === "undefined" || isLoading) {
+    return null;
+  }
 
   return (
     <Layout>
@@ -89,7 +98,7 @@ export function App() {
           {Math.ceil(timeLeft)}
         </div>
 
-        <Text testData={testData?.text} userInput={userInput} />
+        <Progress testData={testData?.text} userInput={userInput} />
 
         <textarea
           ref={textAreaRef}
@@ -101,19 +110,28 @@ export function App() {
           disabled={status === "finished"}
         />
       </div>
+
+      {isStatModalOpen && (
+        <StatModal
+          userInput={userInput}
+          testData={testData}
+          onClose={statModalActions.close}
+        />
+      )}
     </Layout>
   );
 }
 
-interface Props {
+type TProps = {
   testData: string | undefined;
   userInput: string;
-}
+};
 
-function Text({ testData, userInput }: Props) {
+const Progress = ({ testData, userInput }: TProps) => {
   if (!testData) {
     return "Loading...";
   }
+
   const testLetters = testData.split("");
   const typedLetters = userInput.split("");
 
@@ -142,4 +160,4 @@ function Text({ testData, userInput }: Props) {
       })}
     </pre>
   );
-}
+};

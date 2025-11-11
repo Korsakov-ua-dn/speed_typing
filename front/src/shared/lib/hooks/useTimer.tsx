@@ -1,6 +1,11 @@
 import { useCallback, useState } from "react";
 
-export function useTimer(duration: number) {
+type TProps = {
+  duration: number;
+  onFinish: VoidFunction;
+};
+
+export const useTimer = ({ duration, onFinish }: TProps) => {
   const [timeLeft, setTimeLeft] = useState(duration / 1_000);
 
   const [status, setStatus] = useState<"waiting" | "started" | "finished">(
@@ -21,8 +26,12 @@ export function useTimer(duration: number) {
 
       if (delta >= duration) {
         setStatus("finished");
+
         setTimeLeft(0);
+
         intervalId && window.clearInterval(intervalId);
+
+        onFinish();
       } else {
         setTimeLeft((duration - delta) / 1_000);
       }
@@ -35,4 +44,4 @@ export function useTimer(duration: number) {
   }, []);
 
   return { timeLeft, status, start, reset };
-}
+};
