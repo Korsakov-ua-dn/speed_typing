@@ -4,7 +4,7 @@ export const concatTokensWithComments = (
   tokens: TSESTree.Token[],
   comments: TSESTree.Comment[]
 ) => {
-  const result = new Array(tokens.length + comments.length);
+  const result: TSESTree.Token[] = new Array(tokens.length + comments.length);
 
   let tokenIndex = 0;
   let commentIndex = 0;

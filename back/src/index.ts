@@ -4,7 +4,8 @@ import { cors } from "hono/cors";
 
 import { testDataMap, testTypes } from "./testData/index.js";
 import { isTestType } from "./utils/isTestDataType/index.js";
-import { getTSAST } from "./utils/getTSAST/index.js";
+import { getTSTokens } from "./utils/getTSTokens/index.ts";
+import { getTextTokens } from "./utils/getTextTokens/index.ts";
 
 const app = new Hono();
 
@@ -15,9 +16,7 @@ app.get("/health-check", (ctx) => {
 });
 
 app.get("/tests", (ctx) => {
-  return ctx.json({
-    types: testTypes,
-  });
+  return ctx.json(testTypes);
 });
 
 app.get("/tests/:type", async (ctx) => {
@@ -33,15 +32,26 @@ app.get("/tests/:type", async (ctx) => {
   }
 
   if (type === "typescript") {
-    const ast = getTSAST(testDataMap[type]);
+    const text = testDataMap[type];
 
-    console.log(ast);
-    console.log(type);
+    const tokens = getTSTokens(text);
 
     return ctx.json({
       type,
-      text: testDataMap[type],
-      ast,
+      text,
+      tokens,
+    });
+  }
+
+  if (type === "english") {
+    const text = testDataMap[type];
+
+    const tokens = getTextTokens(text);
+
+    return ctx.json({
+      type,
+      text,
+      tokens,
     });
   }
 

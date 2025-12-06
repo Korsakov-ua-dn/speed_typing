@@ -1,4 +1,4 @@
-import { testTypes, type TestType } from "../../testData/index.ts";
+export const ts_3 = `import { testTypes, type TestType } from "../../testData/index.ts";
 
 export const isTestType = (value: unknown): value is TestType => {
   if (typeof value !== "string") {
@@ -11,3 +11,5 @@ export const isTestType = (value: unknown): value is TestType => {
 
   return true;
 };
+
+`;
