@@ -17,6 +17,8 @@ export function App() {
 
   const { testData, isLoading } = useTestQuery(settings.testType);
 
+  // console.log(testData);
+
   const [userInput, setUserInput] = useState<string>("");
 
   const { isOpen: isStatModalOpen, actions: statModalActions } = useOpen();
@@ -41,9 +43,10 @@ export function App() {
       }
 
       if (event.key === "Escape" && statusRef.current === "finished") {
+        statModalActions.close();
         setUserInput("");
         reset();
-        // textAreaRef.current?.focus();
+        textAreaRef.current?.focus();
       }
     };
 
@@ -63,6 +66,42 @@ export function App() {
       window.removeEventListener("keydown", keydownHandler);
     };
   }, [start]);
+
+  // {
+  //   function textToTokens() {
+  //     const text = "../shared/ui/Modal";
+  //     // const text = "some text description";
+  //     console.log(text);
+
+  //     let tokens = [];
+  //     let range0 = 0;
+
+  //     for (let i = 0, l = text.length; i <= l; i++) {
+  //       if (/^[a-zA-Zа-яА-Я]$/.test(text[i])) {
+  //         continue;
+  //       }
+
+  //       if (range0 === i) {
+  //         range0++;
+  //         continue;
+  //       }
+
+  //       const value = text.slice(range0, i);
+
+  //       tokens.push({
+  //         range: [range0, i],
+  //         type: "word",
+  //         value,
+  //       });
+
+  //       range0 = i + 1;
+  //     }
+
+  //     return tokens;
+  //   }
+
+  //   console.log(textToTokens());
+  // }
 
   if (typeof testData === "undefined" || isLoading) {
     return null;

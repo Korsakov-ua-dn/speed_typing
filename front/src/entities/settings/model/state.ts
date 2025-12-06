@@ -4,8 +4,8 @@ import type { TTest } from "../../test/model/useTestQuery";
 
 export const useSettingsState = () => {
   const [state, setState] = useState<TSettings>({
-    duration: 15_000,
-    testType: "typescript",
+    duration: 10_000,
+    testType: "english",
   });
 
   const actions = useMemo(() => {
@@ -29,6 +29,9 @@ export const useSettingsState = () => {
 
 export type TSettings = {
   testType: TTest["type"];
+  /**
+   * @param duration - ms
+   */
   duration: number;
 };
 

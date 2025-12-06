@@ -30,7 +30,7 @@ export const useTimer = ({ duration, onFinish }: TProps) => {
         setTimeLeft(0);
 
         intervalId && window.clearInterval(intervalId);
-
+        console.log("onFinish");
         onFinish();
       } else {
         setTimeLeft((duration - delta) / 1_000);
